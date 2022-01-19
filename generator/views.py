@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 import random
+
+
 # Create your views here.
 
 
@@ -14,26 +16,38 @@ def eggs(request):
 
 
 def password(request):
+    characters = []
+    alphabet = list("abcdefghijklmnopqrstuvwxyz")
 
-    characters = list("abcdefghijklmnopqrstuvwxyz")
+    lower_characters = list("abcdefghijklmnopqrstuvwxyz")
+
     upper_characters = []
-    for char in characters:
+    for char in alphabet:
         upper_characters.append(char.upper())
+
+    if request.GET.get('lowerOnes'):
+        characters.extend(lower_characters)
 
     if request.GET.get('upperSHIT'):
         characters.extend(upper_characters)
 
     if request.GET.get('specialu'):
-        characters.extend(list("!@#$%^&*()_-+=[]}{;:|,<.>/?"))
+        characters.extend(list("!@#$%^&*_-+=?"))
+
+    if request.GET.get('ambiguu'):
+        characters.extend(list("()[]{};:|,<.>/'"))
 
     if request.GET.get('numbers'):
         characters.extend(list("0123456789"))
 
-    length = int(request.GET.get('CIOCOlata', 12))
+    length = int(request.GET.get('Characters', 16))
     thepassword = ''
-    for x in range(length):
-        thepassword += random.choice(characters)
-    return render(request, "generator/password.html", {'password': thepassword})
+    try:
+        for x in range(length):
+            thepassword += random.choice(characters)
+        return render(request, "generator/password.html", {'password': thepassword})
+    except IndexError:
+        return render(request, 'generator/password.html', {'error': 'Please select at least one option.'})
 
 
 def about_us(request):
